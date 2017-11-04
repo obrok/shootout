@@ -3,11 +3,14 @@ use "lib:glfw3.3.1"
 
 use @glfwInit[Bool]()
 use @glfwWindowHint[None](target: I32, hint: I32)
-use @glfwCreateWindow[Pointer[U8] tag](width: I32, height: I32, title: Pointer[U8] tag, monitor: Pointer[U8] tag, share: Pointer[U8] tag)
-use @glfwMakeContextCurrent[None](window: Pointer[U8] tag)
-use @glfwGetPrimaryMonitor[Pointer[U8] tag]()
+use @glfwCreateWindow[Window](width: I32, height: I32, title: Window, monitor: Monitor, share: Window)
+use @glfwMakeContextCurrent[None](window: Window)
+use @glfwGetPrimaryMonitor[Window]()
 use @glfwPollEvents[None]()
-use @glfwGetKey[I32](window: Pointer[U8] tag, key: I32)
+use @glfwGetKey[I32](window: Window, key: I32)
+
+type Window is Pointer[U8] tag
+type Monitor is Pointer[U8] tag
 
 primitive GLTrue fun apply(): I32 => 1
 primitive GLFWSamples fun apply(): I32 => 0x0002100D
@@ -22,7 +25,7 @@ primitive GLFWKeyEscape fun apply(): I32 => 256
 primitive GLFWPress fun apply(): I32 => 1
 
 actor@ Renderer
-  let window: Pointer[U8] tag
+  let window: Window
   var _die: Bool = false
 
   new create() =>
@@ -35,7 +38,7 @@ actor@ Renderer
     @glfwWindowHint(GLFWOpenglProfile(), GLFWOpenglCoreProfile())
 
     let title = "Shootout"
-    window = @glfwCreateWindow(1024, 786, title.cstring(), Pointer[U8], Pointer[U8])
+    window = @glfwCreateWindow(1024, 786, title.cstring(), Monitor, Window)
     @glfwMakeContextCurrent(window)
 
   be render() =>
