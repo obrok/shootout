@@ -1,4 +1,5 @@
 use "path:/usr/local/Cellar/glfw/3.1.2/lib"
+use "lib:GL/glew"
 use "lib:glfw3.3.1"
 
 use @glfwInit[Bool]()
@@ -7,7 +8,9 @@ use @glfwCreateWindow[Window](width: I32, height: I32, title: Window, monitor: M
 use @glfwMakeContextCurrent[None](window: Window)
 use @glfwGetPrimaryMonitor[Window]()
 use @glfwPollEvents[None]()
+use @glfwSwapBuffers[None](window: Window)
 use @glfwGetKey[I32](window: Window, key: I32)
+use @glewInit[U32]()
 
 type Window is Pointer[U8] tag
 type Monitor is Pointer[U8] tag
@@ -23,13 +26,17 @@ primitive GLFWClientApi fun apply(): I32 => 0x00022001
 primitive GLFWOpenglApi fun apply(): I32 => 0x00030001
 primitive GLFWKeyEscape fun apply(): I32 => 256
 primitive GLFWPress fun apply(): I32 => 1
+primitive GLEWOK fun apply(): U32 => 0
 
 actor@ Renderer
-  let window: Window
+  var window: Window = Window
   var _die: Bool = false
+  var _death_message: String = ""
 
   new create() =>
-    @glfwInit()
+    if not @glfwInit() then
+      die("GLFW failed to init")
+    end
 
     @glfwWindowHint(GLFWSamples(), 4)
     @glfwWindowHint(GLFWContextVersionMajor(), 3)
@@ -41,11 +48,26 @@ actor@ Renderer
     window = @glfwCreateWindow(1024, 786, title.cstring(), Monitor, Window)
     @glfwMakeContextCurrent(window)
 
-  be render() =>
-    @glfwPollEvents()
-    if @glfwGetKey(window, GLFWKeyEscape()) == GLFWPress() then
-      _die = true
+    if @glewInit() != GLEWOK() then
+      die("GLEW failed to init")
     end
+
+  be render() =>
+    /* draw() */
+
+    @glfwSwapBuffers(window)
+    @glfwPollEvents()
+
+    if @glfwGetKey(window, GLFWKeyEscape()) == GLFWPress() then
+      die("ESC pressed")
+    end
+
+  fun ref die(message: String) =>
+    _die = true
+    _death_message = message
 
   fun dead(): Bool =>
     _die
+
+  fun death_message(): Pointer[U8] tag =>
+    _death_message.cstring()

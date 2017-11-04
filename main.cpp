@@ -3,6 +3,7 @@
 #include <sys/_types/_ssize_t.h>
 #include "pony.h"
 #include "shootout.h"
+#include <GL/glew.h>
 #include <iostream>
 
 using namespace std;
@@ -21,6 +22,7 @@ int main(int argc, char** argv) {
   pony_become(context, (pony_actor_t*)renderer);
 
   /* Send the first message to the renderer - create */
+  glewExperimental = GL_TRUE;
   Renderer_tag_create_o__send(renderer);
 
   /* Start the actual application. AmbientAuth_Alloc should return the only instance of AmbientAuth. */
@@ -32,4 +34,6 @@ int main(int argc, char** argv) {
   while (!Renderer_box_dead_b(renderer)) {
     pony_poll(context);
   }
+
+  cout << Renderer_box_death_message_o(renderer) << "\n";
 }
