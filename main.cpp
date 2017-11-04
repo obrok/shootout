@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
   /* Create an empty renderer */
   Renderer* renderer = Renderer_Alloc();
 
-  /* Unschedule the renderer an make the main thread become it */
+  /* Unschedule the renderer and make the main thread become it */
   pony_ctx_t* context = pony_ctx();
   pony_unschedule(context, (pony_actor_t*)renderer);
   pony_become(context, (pony_actor_t*)renderer);
@@ -23,7 +23,7 @@ int main(int argc, char** argv) {
   /* Send the first message to the renderer - create */
   Renderer_tag_create_o__send(renderer);
 
-  /* Start the actual application */
+  /* Start the actual application. AmbientAuth_Alloc should return the only instance of AmbientAuth. */
   AmbientAuth* auth = AmbientAuth_Alloc();
   RealMain* main = RealMain_Alloc();
   RealMain_tag_create_ooo__send(main, auth, renderer);

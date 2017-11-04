@@ -23,8 +23,7 @@ primitive GLFWPress fun apply(): I32 => 1
 
 actor@ Renderer
   let window: Pointer[U8] tag
-  var die: Bool = false
-  var counter: U32 = 0
+  var _die: Bool = false
 
   new create() =>
     @glfwInit()
@@ -42,8 +41,8 @@ actor@ Renderer
   be render() =>
     @glfwPollEvents()
     if @glfwGetKey(window, GLFWKeyEscape()) == GLFWPress() then
-      die = true
+      _die = true
     end
 
   fun dead(): Bool =>
-    die
+    _die
