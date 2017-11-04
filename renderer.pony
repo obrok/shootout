@@ -27,7 +27,6 @@ actor@ Renderer
   var counter: U32 = 0
 
   new create() =>
-    None
     @glfwInit()
 
     @glfwWindowHint(GLFWSamples(), 4)

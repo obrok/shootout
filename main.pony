@@ -1,9 +1,3 @@
-use "files"
-
-actor Main
-  new create(env: Env) =>
-    None
-
 actor@ RealMain
   let _auth: (AmbientAuth | None)
   let _renderer: Renderer tag

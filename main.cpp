@@ -16,7 +16,6 @@ int main(int argc, char** argv) {
   Renderer* renderer = Renderer_Alloc();
 
   /* Unschedule the renderer an make the main thread become it */
-  pony_register_thread();
   pony_ctx_t* context = pony_ctx();
   pony_unschedule(context, (pony_actor_t*)renderer);
   pony_become(context, (pony_actor_t*)renderer);
