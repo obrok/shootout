@@ -6,18 +6,13 @@ actor Main
 
 actor@ RealMain
   let _auth: (AmbientAuth | None)
+  let _renderer: Renderer tag
 
-  new create(auth: (AmbientAuth | None)) =>
+  new create(auth: (AmbientAuth | None), renderer: Renderer) =>
     _auth = auth
+    _renderer = renderer
+    this.trigger_render()
 
-    try
-      let auth' = auth as AmbientAuth
-      let caps = recover val FileCaps.>set(FileRead).>set(FileWrite).>set(FileCreate).>set(FileStat) end
-      let path = FilePath(auth', "bork.txt", caps)?
-
-      with file = CreateFile(path) as File do
-        file.print("Hello")
-      end
-    else
-      None
-    end
+  be trigger_render() =>
+    _renderer.render()
+    this.trigger_render()
