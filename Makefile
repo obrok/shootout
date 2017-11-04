@@ -1,7 +1,13 @@
 .PHONY: run
 
-shootout: *.pony
-	ponyc
-
 run: shootout
-	./shootout > positions.dat && gnuplot plot.plt > plot.html && open plot.html
+	./shootout
+
+shootout: main.cpp libshootout.a shootout.h
+	g++ -o shootout -L. -lponyrt -lshootout main.cpp
+
+libshootout.a: *.pony
+	ponyc -l
+
+shootout.h: *.pony
+	ponyc -l
