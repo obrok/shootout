@@ -33,6 +33,7 @@ int main(int argc, char** argv) {
   /* Handle messages arriving to the renderer */
   while (!Renderer_box_dead_b(renderer)) {
     pony_poll(context);
+    cout << Renderer_box_message_o(renderer) << "\n";
   }
 
   cout << Renderer_box_death_message_o(renderer) << "\n";
