@@ -17,7 +17,7 @@ use @glGenBuffers[None](number: ISize, target: Pointer[GLVBO] ref)
 use @glGenVertexArrays[None](number: ISize, target: Pointer[GLVAO] ref)
 use @glBindBuffer[None](target: GLenum, buffer: GLVBO)
 use @glBindVertexArray[None](vao: GLVAO)
-use @glBufferData[None](target: GLenum, size: GLsizeiptr, data: Array[F32], usage: GLenum)
+use @glBufferData[None](target: GLenum, size: GLsizeiptr, data: Pointer[F32] tag, usage: GLenum)
 use @glCreateShader[GLShader](kind: GLenum)
 use @glShaderSource[None](shader: GLShader, no_of_sources: GLsizei, sources: Pointer[Pointer[U8] tag] tag, lengths: VoidPtr)
 use @glCompileShader[None](shader: GLShader)
@@ -138,8 +138,9 @@ actor@ Renderer
     ]
 
     let buffer = _gen_buffer()
+    let float_size = ISize(4)
     @glBindBuffer(GLArrayBuffer(), buffer)
-    @glBufferData(GLArrayBuffer(), ISize.from[USize](vertices.size()), vertices, GLStaticDraw())
+    @glBufferData(GLArrayBuffer(), ISize.from[USize](vertices.size()) * float_size, vertices.cpointer(), GLStaticDraw())
 
     let vertex_shader = _compile_shader(GLVertexShader(), VertexShader())
     let fragment_shader = _compile_shader(GLFragmentShader(), FragmentShader())
