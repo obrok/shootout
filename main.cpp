@@ -5,6 +5,7 @@
 #include "shootout.h"
 #include <GL/glew.h>
 #include <iostream>
+#include <unistd.h>
 
 using namespace std;
 
@@ -33,7 +34,8 @@ int main(int argc, char** argv) {
   /* Handle messages arriving to the renderer */
   while (!Renderer_box_dead_b(renderer)) {
     pony_poll(context);
-    cout << Renderer_box_message_o(renderer) << "\n";
+    /* cout << Renderer_box_message_o(renderer) << "\n"; */
+    usleep(10000);
   }
 
   cout << Renderer_box_death_message_o(renderer) << "\n";

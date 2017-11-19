@@ -2,33 +2,33 @@ class Vec2
   let x: F32
   let y: F32
 
-  new create(x': F32, y': F32) =>
+  new val create(x': F32 val, y': F32 val) =>
     x = x'
     y = y'
 
-  fun add(other: Vec2): Vec2 =>
+  fun val add(other: Vec2 val): Vec2 val =>
     Vec2(x + other.x, y + other.y)
 
-  fun neg(): Vec2 =>
+  fun val neg(): Vec2 val =>
     Vec2(-x, -y)
 
-  fun scalar_product(scalar: F32): Vec2 =>
+  fun val scalar_product(scalar: F32 val): Vec2 val =>
     Vec2(x * scalar, y * scalar)
 
-  fun direction(): Vec2 =>
+  fun val direction(): Vec2 val =>
     Vec2(x / magnitude(), y / magnitude())
 
-  fun magnitude(): F32 =>
+  fun val magnitude(): F32 val =>
     ((x * x) + (y * y)).sqrt()
 
 class Satellite
-  var _position: Vec2
-  var _speed: Vec2
-  let _gravity: F32 = 10
-  let _step: F32 = 0.1
+  var _position: Vec2 val
+  var _speed: Vec2 val
+  let _gravity: F32 val = 10
+  let _step: F32 val = 1
 
-  new create(position: Vec2, speed: Vec2) =>
-    _position = position
+  new create(position': Vec2 val, speed: Vec2 val) =>
+    _position = position'
     _speed = speed
 
   fun ref step() =>
@@ -36,14 +36,10 @@ class Satellite
     let force = (-_position).direction().scalar_product(_gravity / _position.magnitude() / _position.magnitude())
     _speed = _speed + force.scalar_product(_step)
 
-  fun box string(): String iso^ =>
-    let result = _position.x.string() + " " + _position.y.string()
-    recover
-      let result' = String
-      result' .> append(result)
-    end
+  fun box position(): Vec2 val =>
+    _position
 
-class Game is Stringable
+class Game
   let _ship: Satellite
   let _asteroid: Satellite
 
@@ -55,7 +51,7 @@ class Game is Stringable
     _ship.step()
     _asteroid.step()
 
-  fun box string(): String iso^ =>
-    let ship: String = _ship.string()
-    let asteroid: String = _asteroid.string()
-    recover String .> append(ship) .> append(" ") .> append(asteroid) end
+  fun box objects(): Array[Vec2 val] val =>
+    let p1 = _ship.position()
+    let p2 = _asteroid.position()
+    [p1; p2]

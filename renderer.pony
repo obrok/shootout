@@ -1,6 +1,7 @@
 use "path:/usr/local/Cellar/glfw/3.1.2/lib"
 use "lib:GL/glew"
 use "lib:glfw3.3.1"
+use "itertools"
 
 use @glfwInit[Bool]()
 use @glfwWindowHint[None](target: I32, hint: I32)
@@ -108,6 +109,9 @@ actor@ Renderer
   var _death_message: String = ""
   var _program: GLProgram = GLProgram(0)
   var _message: String = ""
+  var _objects: Array[Vec2 val] val = [Vec2(0.0, 0.5); Vec2(0.5, -0.5); Vec2(-0.5, -0.5)]
+  var _buffer: GLVBO = GLVBO(0)
+  var _counter: I32 = 1
 
   new create() =>
     if not @glfwInit() then
@@ -131,16 +135,8 @@ actor@ Renderer
     let vao = _gen_vao()
     @glBindVertexArray(vao)
 
-    let vertices = [as F32:
-      0.0; 0.5
-      0.5; -0.5
-      -0.5; -0.5
-    ]
-
     let buffer = _gen_buffer()
-    let float_size = ISize(4)
     @glBindBuffer(GLArrayBuffer(), buffer)
-    @glBufferData(GLArrayBuffer(), ISize.from[USize](vertices.size()) * float_size, vertices.cpointer(), GLStaticDraw())
 
     let vertex_shader = _compile_shader(GLVertexShader(), VertexShader())
     let fragment_shader = _compile_shader(GLFragmentShader(), FragmentShader())
@@ -163,11 +159,38 @@ actor@ Renderer
       die("ESC pressed. Status: " + code.string())
     end
 
-    @glClearColor(0.1, 0.3, 0.1, 1)
+    @glClearColor(0, 0, 0, 0)
     @glClear(GLColorBufferBit())
-    @glDrawArrays(GLTriangles(), 0, 3)
+    let start: GLint = 0
+    let vertices = _upload_state_to_buffer()
+    @glDrawArrays(GLTriangles(), start, vertices)
 
     @glfwSwapBuffers(_window)
+
+  be update_state(objects: Array[Vec2 val] val) =>
+    _counter = _counter + 1
+    _message = _counter.string()
+    _objects = objects
+    this.render()
+
+  fun _upload_state_to_buffer(): GLsizei =>
+    let vertices = _vertices_from_state()
+    let float_size = ISize(4)
+    @glBufferData(GLArrayBuffer(), ISize.from[USize](vertices.size()) * float_size, vertices.cpointer(), GLStaticDraw())
+    ISize.from[USize](vertices.size() / 2)
+
+  fun _vertices_from_state(): Array[F32] =>
+    Iter[Vec2 val](_objects.values())
+      .flat_map[F32]({(v: Vec2 val): Iterator[F32] =>
+        let x = v.x / 400
+        let y = v.y / 400
+        [
+          x; y
+          x + 0.01; y - 0.02
+          x - 0.01; y - 0.02
+        ].values()
+      })
+      .collect(Array[F32](_objects.size() * 2))
 
   fun _compile_shader(kind: GLenum, text: String): GLShader =>
     let shader = @glCreateShader(kind)
